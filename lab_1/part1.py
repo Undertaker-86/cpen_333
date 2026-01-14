@@ -1,5 +1,5 @@
-# student name:
-# student number:
+# student name: Gyan Edbert Zesiro
+# student number: 38600060
 
 # A command-line 2048 game
 
@@ -80,21 +80,34 @@ def addANewTwoToBoard() -> None:
     # Get empty cell
     for row in range(row_size):
         for col in range(col_size):
-            if board[row][col] == "c":
+            if board[row][col] == "":
                 empty_cells.append((row, col))
 
     # Choose between available cells
     # random.choice selects randomly in a given array
     if empty_cells:  # if empty_cells is not empty (i.e, there are spots available)
         row_chosen, col_chosen = random.choice(empty_cells)
-        board[row_chosen, col_chosen] = 2
+        board[row_chosen][col_chosen] = 2
 
 
 def isFull() -> bool:
     """
     returns True if no empty cell is left, False otherwise
     """
-    pass  # to implement
+    # Algorithm:
+    # - check all cell state, similar to addANewTwoToBoard()
+    # the only difference is that we can use early exit
+    # to make our program faster
+    row_size = len(board)
+    col_size = len(board[0])
+
+    for row in range(row_size):
+        for col in range(col_size):
+            if board[row][col] == "":  # if any cell is empty, exit early
+                return False
+
+    # If all cells are occupied, return true
+    return True
 
 
 def getCurrentScore() -> int:
@@ -102,7 +115,22 @@ def getCurrentScore() -> int:
     calculates and returns the current score
     the score is the sum of all the numbers currently on the board
     """
-    pass  # to implement
+    # Algorithm:
+    # - same as the 2 previous functions, go through all cell and
+    # add the cell content to a number
+    # but we need to check for empty cells to avoid error
+    current_score = 0
+    row_size = len(board)
+    col_size = len(board[0])
+
+    for row in range(row_size):
+        for col in range(col_size):
+            if board[row][col] != "":
+                current_score += board[row][col]
+
+    return current_score
+    # alternative: I don't know if this is allowed, but we can use generators
+    # not used as the main algorithm since we haven't learned it in class
 
 
 def updateTheBoardBasedOnTheUserMove(move: str) -> None:
@@ -111,12 +139,88 @@ def updateTheBoardBasedOnTheUserMove(move: str) -> None:
     the move argument is either 'W', 'A', 'S', or 'D'
     directions: W for up; A for left; S for down, and D for right
     """
-    pass  # to implement
+    global board
+    row_size = len(board)
+    col_size = len(board[0])
+
+    if move == "A":
+        print("test")
+        for row_index in range(row_size):
+            board[row_index] = slideLeftAndMergeRow(board[row_index])
+    elif move == "D":
+        for row_index in range(row_size):
+            board[row_index].reverse()
+            board[row_index] = slideLeftAndMergeRow(board[row_index])
+            board[row_index].reverse()
+    elif move == "W":
+        board = transposeBoard(board)
+        for row_index in range(row_size):
+            board[row_index] = slideLeftAndMergeRow(board[row_index])
+        board = transposeBoard(board)
+    elif move == "S":
+        board = transposeBoard(board)
+        for row_index in range(row_size):
+            board[row_index].reverse()
+            board[row_index] = slideLeftAndMergeRow(board[row_index])
+            board[row_index].reverse()
+        board = transposeBoard(board)
+
+    else:
+        raise RuntimeError("Unexpected logic path")
 
 
 # up to two new functions allowed to be added (if needed)
 # as usual, they must be documented well
 # they have to be placed below this line
+
+
+def slideLeftAndMergeRow(row_array: list) -> list:
+    final_cell = []
+
+    non_empty_cells = [x for x in row_array if x != ""]
+    # Same idea as above, just more "pythonic" as they say
+    # for index in range(len(row_array)):
+    #     if row_array[i] != '':
+    #         non_empty_cells.append(row_array[i])
+
+    is_merged = False  # Flag to check if merging occured
+    non_empty_array_length = len(non_empty_cells)
+
+    for index in range(non_empty_array_length):
+        if is_merged:
+            is_merged = False
+            continue
+
+        if (
+            index + 1 < non_empty_array_length
+            and non_empty_cells[index] == non_empty_cells[index + 1]
+        ):
+            final_cell.append(non_empty_cells[index] * 2)  # merging two adjacent cells
+            is_merged = True
+        else:
+            final_cell.append(non_empty_cells[index])
+
+    # Fill the rest with empty cells
+    while len(final_cell) < len(row_array):
+        final_cell.append("")
+
+    return final_cell
+
+
+def transposeBoard(current_board: list[list]) -> list[list]:
+    new_board = []
+    # Use the passed argument 'current_board', not the global 'board'
+    row_size = len(current_board)
+    col_size = len(current_board[0])
+
+    for col in range(col_size):
+        new_row = []
+        for row in range(row_size):
+            # FIX 1: Use append. You cannot use index assignment on an empty list.
+            new_row.append(current_board[row][col])
+        new_board.append(new_row)
+
+    return new_board
 
 
 if __name__ == "__main__":  # Use as is
