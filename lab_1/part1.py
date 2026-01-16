@@ -129,8 +129,6 @@ def getCurrentScore() -> int:
                 current_score += board[row][col]
 
     return current_score
-    # alternative: I don't know if this is allowed, but we can use generators
-    # not used as the main algorithm since we haven't learned it in class
 
 
 def updateTheBoardBasedOnTheUserMove(move: str) -> None:
@@ -143,17 +141,22 @@ def updateTheBoardBasedOnTheUserMove(move: str) -> None:
     row_size = len(board)
     col_size = len(board[0])
 
+    # Convert all cases to sliding to the left
+    # Once converted to the left, apply the slide and merge left algorithm
+    # Convert back to original case (left stays unchanged)
     if move == "A":
         print("test")
         for row_index in range(row_size):
-            board[row_index] = slideLeftAndMergeRow(board[row_index])
+            board[row_index] = slideLeftAndMergeRow(
+                board[row_index]
+            )  # Slide and merge left algorithm
     elif move == "D":
         for row_index in range(row_size):
             board[row_index].reverse()
             board[row_index] = slideLeftAndMergeRow(board[row_index])
             board[row_index].reverse()
     elif move == "W":
-        board = transposeBoard(board)
+        board = transposeBoard(board)  # Matrix Transpose
         for row_index in range(row_size):
             board[row_index] = slideLeftAndMergeRow(board[row_index])
         board = transposeBoard(board)
@@ -164,7 +167,7 @@ def updateTheBoardBasedOnTheUserMove(move: str) -> None:
             board[row_index] = slideLeftAndMergeRow(board[row_index])
             board[row_index].reverse()
         board = transposeBoard(board)
-
+    # Program shouldn't go here, but just in case there will be a logic path error
     else:
         raise RuntimeError("Unexpected logic path")
 
@@ -175,6 +178,10 @@ def updateTheBoardBasedOnTheUserMove(move: str) -> None:
 
 
 def slideLeftAndMergeRow(row_array: list) -> list:
+    """
+    Slide and merge array for the 2048 game to the left
+    row_array: one row of the 2048 board
+    """
     final_cell = []
 
     non_empty_cells = [x for x in row_array if x != ""]
@@ -208,15 +215,17 @@ def slideLeftAndMergeRow(row_array: list) -> list:
 
 
 def transposeBoard(current_board: list[list]) -> list[list]:
+    """
+    Do a tranpose (swap column and rows)
+    current_board: matrix to be tranposed
+    """
     new_board = []
-    # Use the passed argument 'current_board', not the global 'board'
     row_size = len(current_board)
     col_size = len(current_board[0])
 
     for col in range(col_size):
         new_row = []
         for row in range(row_size):
-            # FIX 1: Use append. You cannot use index assignment on an empty list.
             new_row.append(current_board[row][col])
         new_board.append(new_row)
 
