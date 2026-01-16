@@ -74,7 +74,7 @@ def addANewTwoToBoard() -> None:
     # - Call random on available index
     #
     empty_cells = []
-    row_size = len(board)
+    row_size = len(board)  # Configurable board size in case we're not playing 4x4
     col_size = len(board[0])
 
     # Get empty cell
